@@ -1,0 +1,655 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="canonical" href="https://armaanmalik93183-wq.github.io/isocertificationguide/blog.html" />
+
+    <title>ISO Certification Guide</title>
+    <meta name="description" content="Professional ISO certification insights and compliance guides">
+    <meta property="og:title" content="ISO Certification Guide">
+    <meta property="og:description" content="Professional ISO certification insights and compliance guides">
+    <meta property="og:type" content="article">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --navy: #020617;
+            --navy-mid: #001B44;
+            --gold: #C8960C;
+            --gold-light: #F0C040;
+            --gold-pale: #FDF6DC;
+            --ink: #1a1a2e;
+            --body-text: #374151;
+            --muted: #6B7280;
+            --rule: #E5E7EB;
+            --surface: #FAFAF8;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--surface);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--body-text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── NAV ── */
+        .hero-bg {
+            background: linear-gradient(160deg, #020617 0%, #001B44 55%, #020617 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(200,150,12,.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0,60,140,.25) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        nav .nav-inner {
+            background: rgba(255,255,255,.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 20px;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: -0.01em;
+        }
+        .nav-logo span { color: var(--gold-light); }
+
+        .nav-link {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: rgba(255,255,255,.65);
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            transition: color .2s;
+        }
+        .nav-link:hover { color: var(--gold-light); }
+
+        /* ── HERO ── */
+        .hero-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 72px 24px 80px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(200,150,12,.15);
+            border: 1px solid rgba(200,150,12,.3);
+            border-radius: 999px;
+            padding: 6px 18px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            margin-bottom: 28px;
+        }
+        .hero-eyebrow::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50%      { opacity:.4; transform:scale(.8); }
+        }
+
+        #hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.15;
+            color: #fff;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        #date {
+            font-size: 0.875rem;
+            color: rgba(255,255,255,.45);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+        .hero-divider {
+            width: 3px; height: 3px;
+            background: rgba(255,255,255,.25);
+            border-radius: 50%;
+        }
+        .reading-time {
+            font-size: 0.875rem;
+            color: rgba(255,255,255,.45);
+        }
+
+        /* ── FEATURED IMAGE ── */
+        .featured-image-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+        #featured-image {
+            width: 100%;
+            border-radius: 24px;
+            display: block;
+            box-shadow: 0 40px 80px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.06);
+            transition: opacity .4s ease;
+        }
+        #featured-image.hidden { display: none; }
+
+        /* ── MAIN LAYOUT ── */
+        .page-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 64px 24px 96px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 56px;
+            align-items: start;
+        }
+
+        /* ── ARTICLE CARD ── */
+        .article-card {
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid var(--rule);
+            padding: 64px 56px;
+            box-shadow: 0 2px 24px rgba(0,0,0,.04);
+        }
+
+        /* ── ARTICLE CONTENT TYPOGRAPHY ── */
+        .article-content {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 1.125rem;
+            line-height: 1.9;
+            color: var(--body-text);
+        }
+
+        .article-content {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.125rem;
+    line-height: 1.9;
+    color: var(--body-text);
+    text-align: justify;
+    text-justify: inter-word;
+}
+        }
+        .article-content p:first-child::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 4em;
+            font-weight: 900;
+            float: left;
+            line-height: .85;
+            margin: 0 12px -4px 0;
+            color: var(--navy-mid);
+        }
+
+        .article-content h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--ink);
+            margin: 2.5em 0 .75em;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        .article-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--ink);
+            margin: 2.2em 0 .65em;
+            line-height: 1.25;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gold);
+        }
+        .article-content h3 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 1.8em 0 .5em;
+            letter-spacing: 0.01em;
+        }
+
+        .article-content img {
+            width: 100%;
+            border-radius: 16px;
+            margin: 2.5em 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,.08);
+            border: 1px solid var(--rule);
+        }
+
+        .article-content a {
+            color: var(--navy-mid);
+            text-decoration: underline;
+            text-decoration-color: rgba(0,27,68,.3);
+            text-underline-offset: 3px;
+            transition: text-decoration-color .2s;
+        }
+        .article-content a:hover { text-decoration-color: var(--gold); }
+
+        .article-content ul, .article-content ol {
+            margin: 1.4em 0 1.6em 1.25em;
+        }
+        .article-content li {
+            margin-bottom: .6em;
+            padding-left: .4em;
+        }
+        .article-content ul li::marker { color: var(--gold); font-size: 1.2em; }
+        .article-content ol li::marker { color: var(--navy-mid); font-weight: 700; }
+
+        .article-content blockquote {
+            margin: 2em 0;
+            padding: 24px 32px;
+            border-left: 4px solid var(--gold);
+            background: var(--gold-pale);
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #4B3F1A;
+            font-size: 1.05em;
+        }
+
+        .article-content strong { color: var(--ink); font-weight: 600; }
+        .article-content em { font-style: italic; }
+
+        .article-content code {
+            font-family: 'Courier New', monospace;
+            font-size: .88em;
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            padding: 2px 7px;
+            color: #1D4ED8;
+        }
+
+        .article-content pre {
+            background: var(--ink);
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+            margin: 2em 0;
+        }
+        .article-content pre code {
+            background: none;
+            border: none;
+            color: #E5E7EB;
+            padding: 0;
+            font-size: .9em;
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2em 0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .95rem;
+        }
+        .article-content th {
+            background: var(--navy-mid);
+            color: #fff;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            font-size: .85rem;
+            text-transform: uppercase;
+        }
+        .article-content th:first-child { border-radius: 8px 0 0 0; }
+        .article-content th:last-child  { border-radius: 0 8px 0 0; }
+        .article-content td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--rule);
+        }
+        .article-content tr:nth-child(even) td { background: #F9FAFB; }
+        .article-content tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+        .article-content tr:last-child td:last-child  { border-radius: 0 0 8px 0; }
+
+        /* ── SIDEBAR ── */
+        .sidebar { position: sticky; top: 32px; display: flex; flex-direction: column; gap: 24px; }
+
+        .sidebar-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--rule);
+            padding: 24px;
+        }
+        .sidebar-card-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .badge-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .badge {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .75rem;
+            font-weight: 600;
+            background: #EEF2FF;
+            color: #3730A3;
+            border-radius: 999px;
+            padding: 4px 12px;
+            border: 1px solid #C7D2FE;
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--rule);
+            background: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .85rem;
+            font-weight: 500;
+            color: var(--ink);
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+            text-decoration: none;
+        }
+        .share-btn:hover { background: #F9FAFB; border-color: #D1D5DB; }
+        .share-btn + .share-btn { margin-top: 8px; }
+        .share-icon {
+            width: 28px; height: 28px;
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ── PROGRESS BAR ── */
+        .reading-progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            width: 0%;
+            z-index: 9999;
+            transition: width .1s linear;
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            background: var(--navy);
+            color: rgba(255,255,255,.45);
+            text-align: center;
+            padding: 32px 24px;
+            font-size: .8rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .site-footer a {
+            color: var(--gold-light);
+            text-decoration: none;
+        }
+
+        /* ── LOADING STATE ── */
+        .skeleton {
+            background: linear-gradient(90deg, #E5E7EB 25%, #F3F4F6 50%, #E5E7EB 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s ease-in-out infinite;
+            border-radius: 8px;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .page-wrap {
+                grid-template-columns: 1fr;
+                gap: 32px;
+                padding: 40px 16px 64px;
+            }
+            .sidebar { position: static; }
+            .article-card { padding: 36px 24px; }
+        }
+        @media (max-width: 600px) {
+            .nav-inner { padding: 14px 20px; }
+            .nav-logo { font-size: 1.2rem; }
+            .hero-section { padding: 48px 16px 56px; }
+            .article-content { font-size: 1rem; }
+            .article-content p:first-child::first-letter { font-size: 3.2em; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Reading progress bar -->
+    <div class="reading-progress" id="progress-bar"></div>
+
+    <!-- HERO -->
+    <section class="hero-bg text-white pb-0">
+        <div class="max-w-7xl mx-auto px-6">
+            <nav class="pt-8">
+                <div class="nav-inner">
+                    <a href="index.html" class="nav-logo">ISO <span>Certification</span> Guide</a>
+                    <a href="index.html" class="nav-link">← All Articles</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="hero-section">
+            <div class="hero-eyebrow">ISO Insights</div>
+            <h1 id="hero-title">Loading…</h1>
+            <div class="hero-meta">
+                <span id="date">Loading date…</span>
+                <span class="hero-divider"></span>
+                <span class="reading-time" id="read-time">— min read</span>
+            </div>
+        </div>
+
+        <!-- Featured image bleeds out of hero -->
+        <div class="featured-image-wrap" style="padding-bottom: 0; transform: translateY(36px);">
+            <img id="featured-image" src="" alt="Article featured image" class="hidden">
+        </div>
+    </section>
+
+    <!-- ARTICLE + SIDEBAR -->
+    <div class="page-wrap" style="padding-top: 88px;">
+        <!-- Article -->
+        <article>
+            <div class="article-card">
+                <div id="content" class="article-content">
+                    <!-- skeleton placeholder -->
+                    <div class="skeleton" style="height:1.2em; width:90%; margin-bottom:1em;"></div>
+                    <div class="skeleton" style="height:1.2em; width:75%; margin-bottom:1em;"></div>
+                    <div class="skeleton" style="height:1.2em; width:85%; margin-bottom:1em;"></div>
+                    <div class="skeleton" style="height:1.2em; width:60%; margin-bottom:2.5em;"></div>
+                    <div class="skeleton" style="height:1.2em; width:95%; margin-bottom:1em;"></div>
+                    <div class="skeleton" style="height:1.2em; width:80%;"></div>
+                </div>
+            </div>
+        </article>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Tags -->
+            <div class="sidebar-card">
+                <p class="sidebar-card-title">Topics</p>
+                <div class="badge-strip">
+                    <span class="badge">ISO Standards</span>
+                    <span class="badge">Compliance</span>
+                    <span class="badge">Certification</span>
+                    <span class="badge">Quality</span>
+                    <span class="badge">Audit</span>
+                </div>
+            </div>
+
+            <!-- Share -->
+            <div class="sidebar-card">
+                <p class="sidebar-card-title">Share</p>
+
+                <a href="#" class="share-btn" id="share-linkedin">
+                    <span class="share-icon" style="background:#0A66C2;">
+                        <svg width="16" height="16" fill="#fff" viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zm.02 4.5H3V21h2V8zm3 0h1.88v1.77h.03C11.23 8.3 12.7 8 14 8c3.36 0 4 2.21 4 5.09V21h-2v-7.5c0-1.79-.03-4.09-2.5-4.09-2.5 0-2.88 1.95-2.88 3.96V21H8V8z"/></svg>
+                    </span>
+                    LinkedIn
+                </a>
+
+                <a href="#" class="share-btn" id="share-twitter">
+                    <span class="share-icon" style="background:#000;">
+                        <svg width="14" height="14" fill="#fff" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.23H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </span>
+                    X / Twitter
+                </a>
+
+                <button class="share-btn" id="copy-link-btn">
+                    <span class="share-icon" style="background:#4F46E5;">
+                        <svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M8 9H7a4 4 0 0 0 0 8h1m8-8h1a4 4 0 0 1 0 8h-1M9 12h6" stroke-linecap="round"/></svg>
+                    </span>
+                    <span id="copy-label">Copy Link</span>
+                </button>
+            </div>
+
+            <!-- Back to articles -->
+            <a href="index.html" class="share-btn" style="justify-content:center; background:#001B44; color:#fff; border-color:#001B44; border-radius:12px; padding:14px 20px; font-weight:600;">
+                ← Back to All Articles
+            </a>
+        </aside>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <p>© 2024 <a href="index.html">ISO Certification Guide</a> · Professional compliance insights</p>
+    </footer>
+
+    <script>
+    /* ── Firebase ── */
+    const firebaseConfig = {
+        apiKey: "AIzaSyAq3IgYIFu7l6N_mKNVcyfWKDp1akTauDs",
+        authDomain: "iso-certification-guide.firebaseapp.com",
+        databaseURL: "https://iso-certification-guide-default-rtdb.firebaseio.com",
+        projectId: "iso-certification-guide",
+        storageBucket: "iso-certification-guide.firebasestorage.app",
+        messagingSenderId: "277771367161",
+        appId: "1:277771367161:web:0f61aef15bb9ce0d64a828"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    /* ── Load article ── */
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSlug = urlParams.get("slug");
+
+    if (currentSlug) {
+        database.ref("blogs").orderByChild("slug").equalTo(currentSlug).once("value")
+        .then(snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                const id = Object.keys(data)[0];
+                const post = data[id];
+
+                document.title = post.title + " | ISO Certification Guide";
+                document.getElementById("hero-title").innerText = post.title;
+                document.getElementById("date").innerText = post.date;
+                document.getElementById("content").innerHTML = post.content;
+
+                // Estimate reading time
+                const words = post.content.replace(/<[^>]+>/g, '').split(/\s+/).length;
+                document.getElementById("read-time").innerText = Math.ceil(words / 200) + " min read";
+
+                const featuredImg = document.getElementById("featured-image");
+                featuredImg.src = post.image;
+                featuredImg.classList.remove("hidden");
+
+                // Share URLs
+                const pageUrl = encodeURIComponent(window.location.href);
+                const pageTitle = encodeURIComponent(post.title);
+                document.getElementById("share-linkedin").href =
+                    `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
+                document.getElementById("share-twitter").href =
+                    `https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}`;
+            } else {
+                show404Error();
+            }
+        })
+        .catch(() => show404Error());
+    } else {
+        show404Error();
+    }
+
+    function show404Error() {
+        document.getElementById("hero-title").innerText = "Article Not Found";
+        document.getElementById("content").innerHTML = `
+            <div style="text-align:center; padding:60px 0;">
+                <p style="font-size:4rem; margin-bottom:16px;">📄</p>
+                <h3 style="font-family:'Playfair Display',serif; font-size:1.75rem; color:#1a1a2e; margin-bottom:12px;">Article not found</h3>
+                <p style="color:#6B7280; margin-bottom:32px;">This article may have been moved or deleted.</p>
+                <a href="index.html" style="display:inline-block; background:#001B44; color:#fff; padding:14px 32px; border-radius:12px; text-decoration:none; font-family:'DM Sans',sans-serif; font-weight:600;">← Back to Articles</a>
+            </div>`;
+    }
+
+    /* ── Reading progress bar ── */
+    window.addEventListener('scroll', () => {
+        const el = document.documentElement;
+        const scrolled = el.scrollTop || document.body.scrollTop;
+        const total = el.scrollHeight - el.clientHeight;
+        const pct = total > 0 ? (scrolled / total) * 100 : 0;
+        document.getElementById("progress-bar").style.width = pct + "%";
+    });
+
+    /* ── Copy link ── */
+    document.getElementById("copy-link-btn").addEventListener("click", () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const lbl = document.getElementById("copy-label");
+            lbl.textContent = "Copied!";
+            setTimeout(() => lbl.textContent = "Copy Link", 2000);
+        });
+    });
+    </script>
+</body>
+</html>
