@@ -2,85 +2,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="canonical" href="https://armaanmalik93183-wq.github.io/isocertificationguide/post.html" />
-    
-    <title>ISO Certification Guide</title>
-    <meta name="description" content="Professional ISO certification insights and compliance guides">
-    <meta name="robots" content="index, follow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketingHub</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<meta name="description" content="MarketingHub Blog Article">
+<meta name="robots" content="index,follow">
+<link rel="canonical" id="canonical-url" href="">
 
-    <style>
-        body { font-family:'Manrope',sans-serif; background:#f8fafc; }
-        .article-content img { width:100%; border-radius:28px; margin:50px 0; }
-        .article-content p { margin-bottom:30px; text-align:justify; }
-    </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="MarketingHub">
+<meta property="og:description" content="MarketingHub Blog">
+<meta property="og:image" content="">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+<style>
+body{font-family:Inter,sans-serif;background:#050505;color:#fff}
+.hero-bg{
+background:radial-gradient(circle at top left,rgba(34,197,94,.18),transparent 40%),
+radial-gradient(circle at bottom right,rgba(34,197,94,.12),transparent 40%);
+}
+.article-content{line-height:1.9;color:#d1d5db}
+.article-content img{width:100%;border-radius:20px;margin:30px 0}
+.article-content h1,.article-content h2,.article-content h3{color:#fff;margin:20px 0}
+.article-content p{margin-bottom:20px}
+.article-content ul,.article-content ol{margin:20px}
+.progress{position:fixed;top:0;left:0;height:4px;background:#22c55e;width:0;z-index:9999}
+</style>
 </head>
 
 <body>
-    <main class="max-w-[1600px] mx-auto px-6 py-20">
-        <div class="grid lg:grid-cols-12 gap-10">
-            <article class="lg:col-span-9">
-                <div class="bg-white rounded-[40px] p-10 md:p-20 shadow-sm border border-slate-200">
-                    <div id="content">Loading article contents...</div>
-                </div>
-            </article>
-            </div>
-    </main>
+
+<div id="progress" class="progress"></div>
+
+<section class="hero-bg">
+<div class="max-w-6xl mx-auto px-6 py-8">
+<a href="index.html" class="text-green-400 font-bold">← Back to Blogs</a>
+
+<div class="py-16">
+<h1 id="articleTitle" class="text-5xl md:text-7xl font-black mb-6">
+Loading...
+</h1>
+
+<div class="flex gap-4 text-gray-400">
+<span id="articleDate"></span>
+<span>•</span>
+<span id="readingTime"></span>
+</div>
+</div>
+</div>
+</section>
+
+<main class="max-w-5xl mx-auto px-6 py-10">
+
+<img id="featuredImage"
+class="hidden w-full rounded-3xl mb-10"
+loading="lazy"
+alt="">
+
+<div class="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12">
+
+<div id="content" class="article-content">
+Loading article...
+</div>
+
+<div class="mt-10 flex gap-4 flex-wrap">
+<button id="copyBtn"
+class="bg-green-500 text-black px-6 py-3 rounded-xl font-bold">
+Copy Link
+</button>
+
+<a href="index.html"
+class="border border-green-500 px-6 py-3 rounded-xl text-green-400">
+All Blogs
+</a>
+</div>
+
+</div>
+
+</main>
 
 <script>
 const firebaseConfig = {
-    apiKey:"AIzaSyAq3IgYIFu7l6N_mKNVcyfWKDp1akTauDs",
-    authDomain:"iso-certification-guide.firebaseapp.com",
-    databaseURL:"https://iso-certification-guide-default-rtdb.firebaseio.com",
-    projectId:"iso-certification-guide",
-    storageBucket:"iso-certification-guide.firebasestorage.app",
-    messagingSenderId:"277771367161",
-    appId:"1:277771367161:web:0f61aef15bb9ce0d64a828"
+  apiKey: "AIzaSyCdI8gnXTw7bAuB7ssCA044qf12neionYk",
+  authDomain: "marketinghub-4eb62.firebaseapp.com",
+  databaseURL: "https://marketinghub-4eb62-default-rtdb.firebaseio.com",
+  projectId: "marketinghub-4eb62",
+  storageBucket: "marketinghub-4eb62.firebasestorage.app",
+  messagingSenderId: "431361025139",
+  appId: "1:431361025139:web:bf495f269b30228a407606",
+  measurementId: "G-5LN2F8C2VL"
 };
 
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-const urlParams = new URLSearchParams(window.location.search);
-const queryParameter = urlParams.get('slug') || urlParams.get('id');
+document.getElementById("canonical-url").href = window.location.href;
 
-if (queryParameter) {
-    // Optimized: Use orderByChild for direct lookup rather than downloading all blogs
-    database.ref('blogs').orderByChild('slug').equalTo(queryParameter).once('value').then(snapshot => {
+const slug = new URLSearchParams(window.location.search).get("slug");
+
+if(!slug){
+    show404();
+}else{
+    database.ref("blogs")
+    .orderByChild("slug")
+    .equalTo(slug)
+    .once("value")
+    .then(snapshot=>{
+
         const data = snapshot.val();
-        
-        if (data) {
-            const key = Object.keys(data)[0];
-            const post = data[key];
 
-            document.getElementById('hero-title').innerText = post.title;
-            document.title = post.title + " | ISO Certification Guide";
-            document.getElementById('date').innerText = post.date;
-            document.getElementById('content').innerHTML = post.content;
-            
-            const fImage = document.getElementById('featured-image');
-            fImage.src = post.image;
-            fImage.classList.remove('invisible');
-            
-            // Meta updates
-            document.querySelector('meta[name="description"]')
-                .setAttribute('content', post.content.replace(/<[^>]+>/g, '').substring(0, 150));
-        } else {
-            show404Error();
+        if(!data){
+            show404();
+            return;
         }
-    }).catch(err => show404Error());
-} else {
-    show404Error();
+
+        const post = Object.values(data)[0];
+
+        document.title = post.title + " | MarketingHub";
+
+        document.getElementById("articleTitle").innerText =
+        post.title || "Untitled";
+
+        document.getElementById("articleDate").innerText =
+        post.date || "";
+
+        document.getElementById("content").innerHTML =
+        post.content || "";
+
+        if(post.image){
+            const img = document.getElementById("featuredImage");
+            img.src = post.image;
+            img.alt = post.title;
+            img.classList.remove("hidden");
+        }
+
+        const text =
+        (post.content || "").replace(/<[^>]*>/g,'');
+
+        document.querySelector('meta[name="description"]')
+        .setAttribute("content", text.substring(0,160));
+
+        const words = text.split(/\s+/).length;
+
+        document.getElementById("readingTime").innerText =
+        Math.ceil(words/200) + " min read";
+
+    })
+    .catch(show404);
 }
 
-// Sidebar logic remains same as provided
+function show404(){
+    document.title = "Article Not Found";
+
+    document.getElementById("articleTitle").innerText =
+    "Article Not Found";
+
+    document.getElementById("content").innerHTML = `
+    <div class="text-center py-20">
+        <h2 class="text-4xl font-bold mb-4">
+            Article Not Found
+        </h2>
+        <p class="text-gray-400 mb-8">
+            The requested article could not be found.
+        </p>
+        <a href="index.html"
+           class="bg-green-500 text-black px-6 py-3 rounded-xl font-bold">
+           Back Home
+        </a>
+    </div>`;
+}
+
+document.getElementById("copyBtn").addEventListener("click",()=>{
+navigator.clipboard.writeText(window.location.href);
+alert("Link copied");
+});
+
+window.addEventListener("scroll",()=>{
+const winScroll=document.documentElement.scrollTop;
+const height=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+const scrolled=(winScroll/height)*100;
+document.getElementById("progress").style.width=scrolled+"%";
+});
 </script>
+
 </body>
 </html>
