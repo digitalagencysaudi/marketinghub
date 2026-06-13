@@ -1,1 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Professional CMS Admin Panel</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+<style>
+body{
+    font-family: 'Inter', sans-serif;
+}
+.ql-toolbar{
+    border-radius: 12px 12px 0 0;
+}
+.ql-container{
+    border-radius: 0 0 12px 12px;
+    height: 250px;
+}
+.sidebar-btn.active{
+    background:#1e293b;
+}
+</style>
+</head>
+
+<body class="bg-slate-100">
+
+<div id="auth-gate" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 px-4">
+    <div class="bg-white p-10 rounded-3xl w-full max-w-md shadow-2xl">
+        <div class="text-center mb-6">
+            <div class="w-20 h-20 bg-blue-600 rounded-3xl mx-auto flex items-center justify-center text-white text-3xl font-bold">A</div>
+            <h1 class="text-4xl font-bold mt-5 text-slate-800">Admin Login</h1>
+            <p class="text-slate-500 mt-2">Secure access to dashboard via Auth</p>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block mb-1.5 text-sm font-semibold text-slate-700">Email Address</label>
+                <input type="email" id="gate-email" required placeholder="admin@domain.com" class="w-full border border-slate-300 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"/>
+            </div>
+            <div>
+                <label class="block mb-1.5 text-sm font-semibold text-slate-700">Password</label>
+                <input type="password" id="gate-pass" required placeholder="••••••••" class="w-full border border-slate-300 rounded-2xl px-5 py-3.5 outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"/>
+            </div>
+        </div>
+
+        <button onclick="unlockDashboard()" class="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-4 rounded-2xl font-semibold mt-6 shadow-lg">
+            Connect Dashboard
+        </button>
+        
+        <p id="gate-error" class="hidden text-red-500 text-center mt-4 font-medium text-sm border border-red-100 bg-red-50/50 p-3 rounded-xl"></p>
+    </div>
+</div>
+
+<div id="dashboard-ui" class="hidden">
+    <div class="flex min-h-screen">
+        
+        <aside class="w-72 bg-slate-950 text-white p-6">
+            <div class="mb-12">
+                <h1 class="text-4xl font-extrabold text-blue-500">ISO Admin</h1>
+                <p class="text-slate-400 mt-2">Professional CMS Dashboard</p>
+            </div>
+            <nav class="space-y-3">
+                <button onclick="showSection('dashboard')" class="sidebar-btn active w-full text-left px-5 py-4 rounded-2xl transition hover:bg-slate-800">Dashboard</button>
+                <button onclick="showSection('analytics')" class="sidebar-btn w-full text-left px-5 py-4 rounded-2xl transition hover:bg-slate-800">Analytics</button>
+                <button onclick="showSection('settings')" class="sidebar-btn w-full text-left px-5 py-4 rounded-2xl transition hover:bg-slate-800">Settings</button>
+            </nav>
+        </aside>
+
+        <main class="flex-1">
+            <header class="bg-white border-b px-10 py-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-800">Dashboard</h2>
+                    <p class="text-slate-500 mt-1">Manage blogs and website content</p>
+                </div>
+                <a href="index.html" class="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-medium transition">Visit Website</a>
+            </header>
+
+            <section id="dashboard-section" class="p-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border">
+                        <p class="text-slate-500">Total Posts</p>
+                        <h2 id="total-posts" class="text-5xl font-bold mt-3 text-slate-800">0</h2>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border">
+                        <p class="text-slate-500">Database Status</p>
+                        <h2 class="text-4xl font-bold mt-3 text-green-600">Connected</h2>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border">
+                        <p class="text-slate-500">Admin Access</p>
+                        <h2 class="text-4xl font-bold mt-3 text-blue-600">Active</h2>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    
+                    <div class="bg-white rounded-3xl p-8 shadow-sm border">
+                        <h2 class="text-2xl font-bold mb-6 text-slate-800">Create New Blog</h2>
+                        <form id="post-form" class="space-y-5">
+                            <div>
+                                <label class="block mb-2 font-medium text-slate-700">Blog Title</label>
+                                <input type="text" id="post-title" required placeholder="Enter blog title" class="w-full border border-slate-300 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"/>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-medium text-slate-700">
+                                    Custom URL Slug <span class="text-xs text-slate-400 font-normal">(Optional)</span>
+                                </label>
+                                <input type="text" id="post-slug" placeholder="e.g., custom-seo-slug-here" class="w-full border border-slate-300 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm text-slate-700"/>
+                                <p class="text-xs text-slate-400 mt-1.5 px-1">Leave empty to auto-generate cleaner URL pathways from Title.</p>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-medium text-slate-700">Upload Featured Image</label>
+                                <input type="file" id="post-image" accept="image/*" class="w-full border border-slate-300 rounded-2xl px-4 py-3 bg-white"/>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-medium text-slate-700">Blog Content</label>
+                                <div id="editor"></div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-4 rounded-2xl font-semibold">Publish Blog</button>
+                        </form>
+                    </div>
+
+                    <div class="xl:col-span-2 bg-white rounded-3xl p-8 shadow-sm border">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-2xl font-bold text-slate-800">Published Blogs</h2>
+                            <input type="text" id="search-posts" placeholder="Search blogs..." class="border border-slate-300 rounded-2xl px-4 py-3 outline-none"/>
+                        </div>
+                        <div id="admin-feed" class="space-y-5">
+                            <div class="text-slate-400">Loading blogs...</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="analytics-section" class="hidden p-10">
+                <div class="bg-white rounded-3xl p-10 shadow-sm border">
+                    <h2 class="text-3xl font-bold mb-10 text-slate-800">Website Analytics</h2>
+                    <canvas id="analyticsChart"></canvas>
+                </div>
+            </section>
+
+            <section id="settings-section" class="hidden p-10">
+                <div class="bg-white rounded-3xl p-10 shadow-sm border max-w-4xl">
+                    <h2 class="text-3xl font-bold mb-10 text-slate-800">Website Settings</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block mb-2 font-medium">Website Name</label>
+                            <input type="text" value="ISO Certification Guide" class="w-full border rounded-2xl px-4 py-3"/>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-medium">Admin Email</label>
+                            <input type="email" placeholder="admin@example.com" class="w-full border rounded-2xl px-4 py-3"/>
+                        </div>
+                        <div>
+                            <label class="block mb-2 font-medium">Homepage Description</label>
+                            <textarea rows="5" class="w-full border rounded-2xl px-4 py-3">Professional ISO certification blogs and compliance insights.</textarea>
+                        </div>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-semibold">Save Settings</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAq3IgYIFu7l6N_mKNVcyfWKDp1akTauDs",
+  authDomain: "iso-certification-guide.firebaseapp.com",
+  databaseURL: "https://iso-certification-guide-default-rtdb.firebaseio.com",
+  projectId: "iso-certification-guide",
+  storageBucket: "iso-certification-guide.firebasestorage.app",
+  messagingSenderId: "277771367161",
+  appId: "1:277771367161:web:0f61aef15bb9ce0d64a828"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+let editingBlogId = null;
+
+const quill = new Quill('#editor', {
+    theme: 'snow',
+    placeholder: 'Write professional blog content...',
+    modules: {
+        toolbar: [
+            [{ header: [1,2,3,false] }],
+            ['bold','italic','underline'],
+            [{ align: [] }],
+            [{ list:'ordered' },{ list:'bullet' }],
+            ['link','image'],
+            ['clean']
+        ]
+    }
+});
+
+// SECURE USER AUTHENTICATION ENGINE
+async function unlockDashboard(){
+    const email = document.getElementById('gate-email').value.trim();
+    const password = document.getElementById('gate-pass').value;
+    const errorContainer = document.getElementById('gate-error');
+
+    if(!email || !password) {
+        errorContainer.innerText = "Please complete both fields.";
+        errorContainer.classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        
+        document.getElementById('auth-gate').classList.add('hidden');
+        document.getElementById('dashboard-ui').classList.remove('hidden');
+        errorContainer.classList.add('hidden');
+        
+        loadBlogs();
+
+    } catch (error) {
+        console.error("Authentication routine error:", error);
+        errorContainer.innerText = "Invalid credentials or unauthorized access.";
+        errorContainer.classList.remove('hidden');
+    }
+}
+
+// SECTION SWITCH
+function showSection(section){
+    document.getElementById('dashboard-section').classList.add('hidden');
+    document.getElementById('analytics-section').classList.add('hidden');
+    document.getElementById('settings-section').classList.add('hidden');
+    document.getElementById(section + '-section').classList.remove('hidden');
+}
+
+// CLEAN SLUG FORMATTER UTILITY 
+function createSlug(text){
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g,'') 
+        .replace(/\s+/g,'-')     
+        .replace(/-+/g,'-')      
+        .replace(/^-|-$/g,'');   
+}
+
+// CREATE / UPDATE BLOG LISTENER
+document.getElementById('post-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const title = document.getElementById('post-title').value;
+    const customSlugRaw = document.getElementById('post-slug').value;
+    const imageFile = document.getElementById('post-image').files[0];
+    const content = quill.root.innerHTML;
+
+    const finalSlug = customSlugRaw.trim() ? createSlug(customSlugRaw) : createSlug(title);
+
+    try{
+        let imageURL = '';
+
+        if(imageFile){
+            const formData = new FormData();
+            formData.append('image', imageFile);
+
+            const response = await fetch(
+                'https://api.imgbb.com/1/upload?key=9d11a88447bf1e2f3adc76118bb6f724',
+                { method:'POST', body: formData }
+            );
+            const result = await response.json();
+            imageURL = result.data.url;
+        }
+
+        if(editingBlogId){
+            const updates = {
+                title: title,
+                slug: finalSlug,
+                content: content,
+                date: new Date().toLocaleDateString()
+            };
+            
+            if(imageURL){
+                updates.image = imageURL;
+            }
+
+            await database.ref('blogs/' + editingBlogId).update(updates);
+            alert('Blog Updated Successfully');
+            editingBlogId = null;
+            document.querySelector('#post-form button[type="submit"]').innerText = 'Publish Blog';
+        }
+        else{
+            if(!imageURL){
+                alert('Please select image');
+                return;
+            }
+
+            await database.ref('blogs').push({
+                title: title,
+                slug: finalSlug,
+                image: imageURL,
+                content: content,
+                date: new Date().toLocaleDateString(),
+                timestamp: Date.now()
+            });
+
+            alert('Blog Published Successfully');
+        }
+
+        document.getElementById('post-form').reset();
+        quill.root.innerHTML = '';
+
+    }catch(error){
+        console.error(error);
+        alert(error.message);
+    }
+});
+
+// LOAD BLOGS
+function loadBlogs(){
+    database.ref('blogs').on('value', (snapshot)=>{
+        const feed = document.getElementById('admin-feed');
+        feed.innerHTML = '';
+        const data = snapshot.val();
+
+        if(!data){
+            feed.innerHTML = `<div class="text-slate-400">No blogs available</div>`;
+            return;
+        }
+
+        const posts = Object.keys(data);
+        document.getElementById('total-posts').innerText = posts.length;
+
+        posts.reverse().forEach((key)=>{
+            const post = data[key];
+            feed.innerHTML += `
+                <div class="border border-slate-200 rounded-3xl p-5 hover:shadow-lg transition">
+                    <div class="flex justify-between gap-5 items-start">
+                        <div class="flex gap-5">
+                            <img src="${post.image || 'https://via.placeholder.com/120'}" class="w-28 h-28 rounded-2xl object-cover"/>
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-800 max-w-xl">${post.title}</h3>
+                                <p class="text-slate-500 mt-1 text-sm font-mono bg-slate-100 px-2 py-0.5 rounded w-fit text-slate-600">
+                                    slug: ${post.slug || '(none)'}
+                                </p>
+                                <p class="text-slate-400 mt-1 text-xs">${post.date}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="editBlog('${key}')" class="bg-blue-100 hover:bg-blue-200 text-blue-600 px-5 py-3 rounded-2xl h-fit">Edit</button>
+                            <button onclick="deleteBlog('${key}')" class="bg-red-100 hover:bg-red-200 text-red-600 px-5 py-3 rounded-2xl h-fit">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    });
+}
+
+function editBlog(id){
+    database.ref('blogs/' + id).once('value').then((snapshot)=>{
+        const post = snapshot.val();
+
+        document.getElementById('post-title').value = post.title;
+        document.getElementById('post-slug').value = post.slug || '';
+        quill.root.innerHTML = post.content;
+
+        editingBlogId = id;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.querySelector('#post-form button[type="submit"]').innerText = 'Update Blog';
+    });
+}
+
+// DELETE FUNCTION
+function deleteBlog(id){
+    if(confirm('Delete this blog permanently?')){
+        database.ref('blogs/' + id).remove();
+    }
+}
+
+// FIXED STORAGELESS METHOD: Uploads computer file to a free hosting API, then saves link to Firebase Database
+document.getElementById('pdf-resource-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const pdfTitle = document.getElementById('pdf-title').value;
+    const fileInput = document.getElementById('pdf-file-input');
+    const submitBtn = document.getElementById('pdf-submit-btn');
+    const selectedFile = fileInput.files[0];
+
+    if(!selectedFile) {
+        alert("Please select a file to upload first!");
+        return;
+    }
+
+    submitBtn.innerText = "Uploading File...";
+    submitBtn.disabled = true;
+
+    try {
+        // 1. Pack the local PDF file data
+        const formData = new FormData();
+        formData.append('reqtype', 'fileupload');
+        formData.append('fileToUpload', selectedFile);
+
+        // 2. Upload directly to Catbox API (No CORS block on GitHub Pages)
+        const response = await fetch('https://catbox.moe/user/api.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error("The file hosting server is busy. Please try again.");
+        }
+
+        const downloadUrl = await response.text(); // Catbox returns the direct URL as pure text
+
+        if(!downloadUrl.includes('http')) {
+            throw new Error("Invalid server response.");
+        }
+
+        // 3. Save the title and direct link to your Realtime Database 'pdfs' path
+        await database.ref('pdfs').push({
+            title: pdfTitle,
+            url: downloadUrl.trim(),
+            date: new Date().toLocaleDateString(),
+            timestamp: Date.now()
+        });
+
+        alert('PDF file processed and published successfully!');
+        document.getElementById('pdf-resource-form').reset();
+    } catch(error) {
+        console.error("Upload process error:", error);
+        alert('Failed to publish: ' + error.message);
+    } finally {
+        submitBtn.innerText = "Publish PDF";
+        submitBtn.disabled = false;
+    }
+});
+
+new Chart(document.getElementById('analyticsChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Blogs','Visitors','Views','Comments'],
+        disabled: true,
+        datasets: [{
+            label: 'Website Analytics',
+            data: [12,50,120,30]
+        }]
+    }
+});
+</script>
+</body>
+</html>
 
