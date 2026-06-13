@@ -1,341 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="google-site-verification" content="90TLnb5U7Mmc_WrHhlsl_8L22WFqNdtI6OUoJ7NWYkQ" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="90TLnb5U7Mmc_WrHhlsl_8L22WFqNdtI6OUoJ7NWYkQ" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>MarketingHub</title>
+  <title>MarketingHub</title>
+  <meta name="description" content="MarketingHub - Digital marketing insights, SEO strategies, PPC, and growth marketing blogs">
+  <meta name="keywords"    content="MarketingHub, Digital Marketing, SEO Blogs, PPC, Marketing Insights">
+  <meta name="robots"      content="index, follow">
 
-    <meta name="description" content="MarketingHub - Digital marketing insights, SEO strategies, PPC, and growth marketing blogs">
-    <meta name="keywords" content="MarketingHub, Digital Marketing, SEO Blogs, PPC, Marketing Insights">
-    <meta name="robots" content="index, follow">
+  <meta property="og:title"       content="MarketingHub">
+  <meta property="og:description" content="MarketingHub - Digital marketing insights and strategies">
+  <meta property="og:type"        content="website">
 
-    <meta property="og:title" content="MarketingHub">
-    <meta property="og:description" content="MarketingHub - Digital marketing insights and strategies">
-    <meta property="og:type" content="website">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #050505; }
 
-    <!-- Firebase Compat SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    .hero-bg {
+      background:
+        radial-gradient(circle at top left,  rgba(34,197,94,0.18), transparent 40%),
+        radial-gradient(circle at bottom right, rgba(34,197,94,0.12), transparent 40%);
+    }
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #050505;
-        }
+    .glass-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
 
-        .hero-bg {
-            background:
-                radial-gradient(circle at top left, rgba(34,197,94,0.18), transparent 40%),
-                radial-gradient(circle at bottom right, rgba(34,197,94,0.12), transparent 40%);
-        }
+    .blog-card {
+      transition: all 0.35s ease;
+    }
+    .blog-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(34,197,94,0.5);
+      box-shadow: 0 20px 40px rgba(34,197,94,0.15);
+    }
 
-        .glass-card {
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
+    .green-glow { box-shadow: 0 0 25px rgba(34,197,94,0.25); }
 
-        .blog-card {
-            transition: all 0.35s ease;
-        }
+    /* Disabled pagination button */
+    .page-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
 
-        .blog-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(34,197,94,0.5);
-            box-shadow: 0 20px 40px rgba(34,197,94,0.15);
-        }
-
-        .green-glow {
-            box-shadow: 0 0 25px rgba(34,197,94,0.25);
-        }
-    </style>
+    /* Skeleton pulse */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .skeleton { animation: pulse 1.6s ease-in-out infinite; background: rgba(255,255,255,0.07); border-radius: 12px; }
+  </style>
 </head>
 
 <body class="text-white">
 
-<!-- HERO -->
-<section class="hero-bg min-h-screen flex flex-col">
+<!-- ===== HERO ===== -->
+<section class="hero-bg min-h-screen flex flex-col" id="home">
 
-    <!-- HEADER -->
-    <header class="max-w-7xl mx-auto w-full px-6 py-8 flex justify-between items-center">
+  <header class="max-w-7xl mx-auto w-full px-6 py-8 flex justify-between items-center">
+    <h1 class="text-3xl font-black">
+      Marketing<span class="text-green-500">Hub</span>
+    </h1>
+    <nav class="hidden md:flex gap-8 text-gray-300 font-medium">
+      <a href="#home"   class="hover:text-green-400 transition">Home</a>
+      <a href="#blogs"  class="hover:text-green-400 transition">Blogs</a>
+      <a href="#about"  class="hover:text-green-400 transition">About</a>
+    </nav>
+  </header>
 
-        <h1 class="text-3xl font-black">
-            Marketing<span class="text-green-500">Hub</span>
-        </h1>
+  <div class="flex-1 flex items-center justify-center px-6">
+    <div class="max-w-4xl text-center">
 
-        <nav class="hidden md:flex gap-8 text-gray-300 font-medium">
-            <a href="#" class="hover:text-green-400 transition">Home</a>
-            <a href="#" class="hover:text-green-400 transition">Blogs</a>
-            <a href="#" class="hover:text-green-400 transition">About</a>
-            <a href="#" class="hover:text-green-400 transition">Contact</a>
-        </nav>
+      <div class="inline-block px-4 py-2 rounded-full glass-card text-green-400 text-sm mb-6">
+        Digital Marketing Insights
+      </div>
 
-    </header>
+      <h2 class="text-5xl md:text-7xl font-black leading-tight">
+        Fuel Your Growth With
+        <span class="text-green-500">Smarter Marketing</span>
+      </h2>
 
-    <!-- HERO CONTENT -->
-    <div class="flex-1 flex items-center justify-center px-6">
+      <p class="mt-8 text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+        Explore actionable insights on SEO, PPC, social media,
+        content marketing, and growth strategies to help your business thrive.
+      </p>
 
-        <div class="max-w-4xl text-center">
-
-            <div class="inline-block px-4 py-2 rounded-full glass-card text-green-400 text-sm mb-6">
-                Digital Marketing Insights
-            </div>
-
-            <h2 class="text-5xl md:text-7xl font-black leading-tight">
-                Fuel Your Growth With
-                <span class="text-green-500">
-                    Smarter Marketing
-                </span>
-            </h2>
-
-            <p class="mt-8 text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Explore actionable insights on SEO, PPC, social media,
-                content marketing, and growth strategies to help your business thrive.
-            </p>
-
-            <!-- SEARCH -->
-            <div class="mt-12 flex flex-col md:flex-row gap-4 justify-center">
-
-                <input
-                    id="searchInput"
-                    type="text"
-                    placeholder="Search articles..."
-                    class="w-full md:w-96 px-5 py-4 rounded-2xl glass-card outline-none focus:border-green-500">
-
-                <button
-                    class="px-8 py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-2xl transition green-glow">
-
-                    Search
-
-                </button>
-
-            </div>
-
-        </div>
+      <!-- SEARCH BAR -->
+      <div class="mt-12 flex flex-col md:flex-row gap-4 justify-center">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search articles..."
+          class="w-full md:w-96 px-5 py-4 rounded-2xl glass-card text-white outline-none focus:border-green-500 border border-transparent transition"
+        >
+        <button
+          id="searchBtn"
+          class="px-8 py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-2xl transition green-glow">
+          Search
+        </button>
+      </div>
 
     </div>
+  </div>
+</section>
+
+
+<!-- ===== BLOG SECTION ===== -->
+<section class="max-w-7xl mx-auto px-6 py-20" id="blogs">
+
+  <div class="flex justify-between items-center mb-12">
+    <div>
+      <h3 class="text-4xl font-black">Latest <span class="text-green-500">Blogs</span></h3>
+      <p class="text-gray-400 mt-2">Stay updated with the newest marketing trends.</p>
+    </div>
+  </div>
+
+  <!-- Post grid -->
+  <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Skeleton placeholders shown while loading -->
+    <div class="skeleton h-80"></div>
+    <div class="skeleton h-80"></div>
+    <div class="skeleton h-80"></div>
+    <div class="skeleton h-80 hidden md:block"></div>
+    <div class="skeleton h-80 hidden md:block"></div>
+    <div class="skeleton h-80 hidden md:block"></div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-center items-center gap-5 mt-14">
+    <button id="prevPage" class="page-btn px-5 py-3 glass-card rounded-xl hover:border-green-500 transition">← Previous</button>
+    <span   id="pageInfo" class="font-semibold text-green-400"></span>
+    <button id="nextPage" class="page-btn px-5 py-3 glass-card rounded-xl hover:border-green-500 transition">Next →</button>
+  </div>
 
 </section>
 
 
-<!-- BLOG SECTION -->
-<section class="max-w-7xl mx-auto px-6 py-20">
-
-    <div class="flex justify-between items-center mb-12">
-
-        <div>
-            <h3 class="text-4xl font-black">
-                Latest <span class="text-green-500">Blogs</span>
-            </h3>
-
-            <p class="text-gray-400 mt-2">
-                Stay updated with the newest marketing trends.
-            </p>
-        </div>
-
-    </div>
-
-    <div
-        id="posts-container"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    </div>
-
-    <!-- Pagination -->
-    <div class="flex justify-center items-center gap-5 mt-14">
-
-        <button
-            id="prevPage"
-            class="px-5 py-3 glass-card rounded-xl hover:border-green-500 transition">
-
-            Previous
-
-        </button>
-
-        <span
-            id="pageInfo"
-            class="font-semibold text-green-400">
-        </span>
-
-        <button
-            id="nextPage"
-            class="px-5 py-3 glass-card rounded-xl hover:border-green-500 transition">
-
-            Next
-
-        </button>
-
-    </div>
-
+<!-- ===== ABOUT ===== -->
+<section id="about" class="max-w-4xl mx-auto px-6 py-20 text-center">
+  <h3 class="text-4xl font-black mb-4">About <span class="text-green-500">MarketingHub</span></h3>
+  <p class="text-gray-400 text-lg leading-relaxed">
+    MarketingHub is your go-to resource for actionable digital marketing knowledge.
+    From SEO deep-dives to PPC playbooks, our expert-written blogs help marketers
+    and business owners grow smarter.
+  </p>
 </section>
 
 
 <script>
-/* FIREBASE CONFIG */
-const firebaseConfig = {
-    apiKey: "AIzaSyCdI8gnXTw7bAuB7ssCA044qf12neionYk",
-    authDomain: "marketinghub-4eb62.firebaseapp.com",
-    projectId: "marketinghub-4eb62",
-    storageBucket: "marketinghub-4eb62.firebasestorage.app",
+// ===== FIREBASE (safe init) =====
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:            "AIzaSyCdI8gnXTw7bAuB7ssCA044qf12neionYk",
+    authDomain:        "marketinghub-4eb62.firebaseapp.com",
+    projectId:         "marketinghub-4eb62",
+    storageBucket:     "marketinghub-4eb62.firebasestorage.app",
     messagingSenderId: "431361025139",
-    appId: "1:431361025139:web:bf495f269b30228a407606",
-    measurementId: "G-5LN2F8C2VL"
-};
-
-firebase.initializeApp(firebaseConfig);
-
+    appId:             "1:431361025139:web:bf495f269b30228a407606",
+    measurementId:     "G-5LN2F8C2VL"
+  });
+}
 const database = firebase.database();
 
-/* VARIABLES */
-let allPosts = [];
+// ===== STATE =====
+let allPosts      = [];
 let filteredPosts = [];
-let currentPage = 1;
-
+let currentPage   = 1;
 const postsPerPage = 6;
 
+// ===== STRIP HTML + ENTITIES =====
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return (div.textContent || div.innerText || '').replace(/\s+/g, ' ').trim();
+}
 
-/* FETCH BLOGS */
+// ===== SKELETON → OFF =====
+function clearSkeleton() {
+  const container = document.getElementById('posts-container');
+  // Only clear skeletons, not rendered cards
+  container.querySelectorAll('.skeleton').forEach(el => el.remove());
+}
+
+// ===== FETCH BLOGS =====
 database.ref('blogs').on('value', (snapshot) => {
+  const data = snapshot.val();
+  clearSkeleton();
 
-    const data = snapshot.val();
+  if (!data) {
+    document.getElementById('posts-container').innerHTML = `
+      <div class="col-span-full text-center text-gray-400 py-16">
+        <p class="text-2xl mb-2">📭</p>
+        <p>No blogs published yet. Check back soon!</p>
+      </div>`;
+    document.getElementById('pageInfo').innerText = '';
+    return;
+  }
 
-    const container = document.getElementById('posts-container');
+  // Map and sort newest-first by timestamp
+  allPosts = Object.keys(data)
+    .map(key => ({ id: key, ...data[key] }))
+    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-    if (!data) {
-        container.innerHTML = `
-            <div class="col-span-full text-center text-gray-400">
-                No blogs found.
-            </div>`;
-        return;
-    }
-
-    allPosts = Object.keys(data).map(key => ({
-        id: key,
-        ...data[key]
-    }));
-
-    filteredPosts = allPosts;
-
-    renderPosts(filteredPosts);
+  filteredPosts = [...allPosts];
+  currentPage   = 1;
+  renderPosts(filteredPosts);
 });
 
-
-/* RENDER POSTS */
+// ===== RENDER POSTS =====
 function renderPosts(posts) {
+  const container = document.getElementById('posts-container');
+  container.innerHTML = '';
 
-    const container = document.getElementById('posts-container');
+  if (posts.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full text-center text-gray-400 py-16">
+        <p class="text-2xl mb-2">🔍</p>
+        <p>No articles match your search. Try a different keyword.</p>
+      </div>`;
+    document.getElementById('pageInfo').innerText = '';
+    document.getElementById('prevPage').disabled = true;
+    document.getElementById('nextPage').disabled = true;
+    return;
+  }
 
-    container.innerHTML = '';
+  const start     = (currentPage - 1) * postsPerPage;
+  const pagePosts = posts.slice(start, start + postsPerPage);
 
-    const start = (currentPage - 1) * postsPerPage;
-    const end = start + postsPerPage;
+  pagePosts.forEach(post => {
+    const slug    = post.slug || post.id;
+    const excerpt = stripHtml(post.content || '').substring(0, 120);
+    const image   = post.image || 'https://placehold.co/600x400/111827/22c55e?text=No+Image';
 
-    const pagePosts = posts.slice(start, end);
+    container.innerHTML += `
+      <article class="glass-card rounded-3xl overflow-hidden blog-card flex flex-col">
+        <img
+          src="${image}"
+          alt="${post.title || 'Blog image'}"
+          class="h-56 w-full object-cover"
+          loading="lazy"
+          onerror="this.src='https://placehold.co/600x400/111827/22c55e?text=No+Image'">
+        <div class="p-6 flex flex-col flex-1">
+          <p class="text-green-500 text-xs font-semibold mb-2 uppercase tracking-widest">${post.date || ''}</p>
+          <h4 class="font-bold text-xl mb-3 leading-snug flex-1">${post.title || 'Untitled'}</h4>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            ${excerpt}${excerpt.length >= 120 ? '...' : ''}
+          </p>
+          <a href="blog.html?slug=${encodeURIComponent(slug)}"
+             class="inline-flex items-center mt-5 text-green-400 font-semibold hover:text-green-300 transition text-sm">
+            Read More →
+          </a>
+        </div>
+      </article>`;
+  });
 
-    pagePosts.forEach(post => {
+  updatePagination(posts);
 
-        const slug = post.slug || post.id;
-
-        container.innerHTML += `
-        <div class="glass-card rounded-3xl overflow-hidden blog-card">
-
-            <img
-                src="${post.image || 'https://via.placeholder.com/600x400'}"
-                class="h-56 w-full object-cover">
-
-            <div class="p-6">
-
-                <h4 class="font-bold text-2xl mb-4">
-                    ${post.title || 'Untitled'}
-                </h4>
-
-                <p class="text-gray-400 leading-relaxed">
-                    ${(post.content || '')
-                        .replace(/<[^>]+>/g,'')
-                        .substring(0,120)}...
-                </p>
-
-                <a href="blog.html?slug=${slug}"
-                   class="inline-flex items-center mt-6 text-green-400 font-semibold hover:text-green-300">
-
-                    Read More →
-
-                </a>
-
-            </div>
-
-        </div>`;
-    });
-
-    updatePagination(posts);
+  // Smooth scroll to blog section on page change
+  if (currentPage > 1) {
+    document.getElementById('blogs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
-
-/* PAGINATION */
+// ===== PAGINATION =====
 function updatePagination(posts) {
+  const totalPages = Math.max(1, Math.ceil(posts.length / postsPerPage));
 
-    const totalPages = Math.ceil(posts.length / postsPerPage);
-
-    document.getElementById('pageInfo').innerText =
-        `Page ${currentPage} of ${totalPages}`;
-
-    document.getElementById('prevPage').disabled =
-        currentPage === 1;
-
-    document.getElementById('nextPage').disabled =
-        currentPage === totalPages;
+  document.getElementById('pageInfo').innerText  = `Page ${currentPage} of ${totalPages}`;
+  document.getElementById('prevPage').disabled   = currentPage === 1;
+  document.getElementById('nextPage').disabled   = currentPage >= totalPages;
 }
 
-
-/* SEARCH */
-document.getElementById('searchInput')
-.addEventListener('input', function() {
-
-    const value = this.value.toLowerCase();
-
-    filteredPosts = allPosts.filter(post =>
-        (post.title || '').toLowerCase().includes(value)
-    );
-
-    currentPage = 1;
-
-    renderPosts(filteredPosts);
-
+document.getElementById('prevPage').addEventListener('click', () => {
+  if (currentPage > 1) { currentPage--; renderPosts(filteredPosts); }
+});
+document.getElementById('nextPage').addEventListener('click', () => {
+  const total = Math.ceil(filteredPosts.length / postsPerPage);
+  if (currentPage < total) { currentPage++; renderPosts(filteredPosts); }
 });
 
+// ===== SEARCH =====
+function doSearch() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  filteredPosts = q
+    ? allPosts.filter(p => (p.title || '').toLowerCase().includes(q) || stripHtml(p.content || '').toLowerCase().includes(q))
+    : [...allPosts];
+  currentPage = 1;
+  renderPosts(filteredPosts);
+}
 
-/* PAGINATION BUTTONS */
-document.getElementById('prevPage')
-.addEventListener('click', () => {
+// Live search on typing
+document.getElementById('searchInput').addEventListener('input', doSearch);
 
-    if(currentPage > 1) {
+// Search button click
+document.getElementById('searchBtn').addEventListener('click', doSearch);
 
-        currentPage--;
-
-        renderPosts(filteredPosts);
-    }
-
-});
-
-
-document.getElementById('nextPage')
-.addEventListener('click', () => {
-
-    const totalPages =
-        Math.ceil(filteredPosts.length / postsPerPage);
-
-    if(currentPage < totalPages) {
-
-        currentPage++;
-
-        renderPosts(filteredPosts);
-    }
-
+// Search on Enter key
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
 });
 </script>
 
