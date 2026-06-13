@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="canonical" href="https://armaanmalik93183-wq.github.io/isocertificationguide/post.html" />
+    
+    <title>ISO Certification Guide</title>
+    <meta name="description" content="Professional ISO certification insights and compliance guides">
+    <meta name="robots" content="index, follow">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        body { font-family:'Manrope',sans-serif; background:#f8fafc; }
+        .article-content img { width:100%; border-radius:28px; margin:50px 0; }
+        .article-content p { margin-bottom:30px; text-align:justify; }
+    </style>
+</head>
+
+<body>
+    <main class="max-w-[1600px] mx-auto px-6 py-20">
+        <div class="grid lg:grid-cols-12 gap-10">
+            <article class="lg:col-span-9">
+                <div class="bg-white rounded-[40px] p-10 md:p-20 shadow-sm border border-slate-200">
+                    <div id="content">Loading article contents...</div>
+                </div>
+            </article>
+            </div>
+    </main>
+
+<script>
+const firebaseConfig = {
+    apiKey:"AIzaSyAq3IgYIFu7l6N_mKNVcyfWKDp1akTauDs",
+    authDomain:"iso-certification-guide.firebaseapp.com",
+    databaseURL:"https://iso-certification-guide-default-rtdb.firebaseio.com",
+    projectId:"iso-certification-guide",
+    storageBucket:"iso-certification-guide.firebasestorage.app",
+    messagingSenderId:"277771367161",
+    appId:"1:277771367161:web:0f61aef15bb9ce0d64a828"
+};
+
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+const urlParams = new URLSearchParams(window.location.search);
+const queryParameter = urlParams.get('slug') || urlParams.get('id');
+
+if (queryParameter) {
+    // Optimized: Use orderByChild for direct lookup rather than downloading all blogs
+    database.ref('blogs').orderByChild('slug').equalTo(queryParameter).once('value').then(snapshot => {
+        const data = snapshot.val();
+        
+        if (data) {
+            const key = Object.keys(data)[0];
+            const post = data[key];
+
+            document.getElementById('hero-title').innerText = post.title;
+            document.title = post.title + " | ISO Certification Guide";
+            document.getElementById('date').innerText = post.date;
+            document.getElementById('content').innerHTML = post.content;
+            
+            const fImage = document.getElementById('featured-image');
+            fImage.src = post.image;
+            fImage.classList.remove('invisible');
+            
+            // Meta updates
+            document.querySelector('meta[name="description"]')
+                .setAttribute('content', post.content.replace(/<[^>]+>/g, '').substring(0, 150));
+        } else {
+            show404Error();
+        }
+    }).catch(err => show404Error());
+} else {
+    show404Error();
+}
+
+// Sidebar logic remains same as provided
+</script>
+</body>
+</html>
