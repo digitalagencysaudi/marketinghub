@@ -3,115 +3,263 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MarketingHub Blog</title>
+
+<!-- Dynamic SEO tags — filled by JS after Firebase fetch -->
+<title>Loading... | MarketingHub</title>
 <meta name="description" content="MarketingHub blog article">
-<link rel="canonical" href="">
-<meta property="og:type" content="article">
-<meta property="og:title" content="MarketingHub Blog">
-<meta property="og:description" content="MarketingHub article">
-<meta property="og:image" content="">
+<link rel="canonical" id="canonical-tag" href="">
+
+<!-- Open Graph -->
+<meta property="og:type"        content="article">
+<meta property="og:title"       id="og-title"       content="MarketingHub Blog">
+<meta property="og:description" id="og-description" content="MarketingHub article">
+<meta property="og:image"       id="og-image"       content="">
+<meta property="og:url"         id="og-url"         content="">
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
 <style>
-body{font-family:Inter,sans-serif;background:#050505;color:#fff}
-.progress{position:fixed;top:0;left:0;height:4px;background:#22c55e;width:0;z-index:9999}
-.article-content img{max-width:100%;border-radius:16px;margin:20px 0}
-.article-content h2{font-size:2rem;margin:20px 0;color:#22c55e}
-.article-content p{margin:12px 0;line-height:1.8}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+  body {
+    font-family: Inter, sans-serif;
+    background: #050505;
+    color: #fff;
+  }
+
+  /* Reading progress bar */
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 4px;
+    background: #22c55e;
+    width: 0;
+    z-index: 9999;
+    transition: width 0.1s linear;
+  }
+
+  /* Article content styles */
+  .article-content img  { max-width: 100%; border-radius: 16px; margin: 24px 0; }
+  .article-content h1   { font-size: 2.2rem; font-weight: 900; margin: 28px 0 12px; }
+  .article-content h2   { font-size: 1.75rem; font-weight: 800; margin: 24px 0 10px; color: #22c55e; }
+  .article-content h3   { font-size: 1.4rem; font-weight: 700; margin: 20px 0 8px; }
+  .article-content p    { margin: 14px 0; line-height: 1.85; color: #d1d5db; }
+  .article-content ul,
+  .article-content ol   { margin: 14px 0 14px 24px; color: #d1d5db; line-height: 1.85; }
+  .article-content ul   { list-style: disc; }
+  .article-content ol   { list-style: decimal; }
+  .article-content a    { color: #22c55e; text-decoration: underline; }
+  .article-content blockquote {
+    border-left: 4px solid #22c55e;
+    padding: 10px 20px;
+    margin: 20px 0;
+    background: #111;
+    border-radius: 0 12px 12px 0;
+    color: #9ca3af;
+    font-style: italic;
+  }
+  .article-content strong { color: #fff; }
+  .article-content pre   { background: #111; padding: 16px; border-radius: 12px; overflow-x: auto; }
+  .article-content code  { font-family: monospace; color: #86efac; }
+
+  /* Fade-in animation for article */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeUp 0.5s ease forwards; }
+
+  /* Error / Not Found box */
+  .error-box {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .error-box h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ef4444;
+    margin-bottom: 12px;
+  }
+  .error-box p  { color: #9ca3af; margin-bottom: 24px; }
+  .error-box a  {
+    display: inline-block;
+    background: #22c55e;
+    color: #000;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+  }
 </style>
 </head>
 <body>
+
+<!-- Reading progress -->
 <div id="progress" class="progress"></div>
 
+<!-- Header -->
 <header class="max-w-6xl mx-auto p-6">
-<a href="index.html" class="text-green-500 font-bold">← Back to Blogs</a>
+  <a href="index.html" class="text-green-500 font-bold text-sm hover:underline">← Back to Blogs</a>
 </header>
 
+<!-- Hero section: title, meta, image -->
 <section class="max-w-5xl mx-auto px-6 py-10">
-<h1 id="title" class="text-5xl font-black mb-4">Loading...</h1>
-<p id="date" class="text-gray-400 mb-6"></p>
-<p id="readingTime" class="text-green-400 mb-8"></p>
-<img id="featuredImage" class="w-full rounded-3xl hidden" loading="lazy">
+  <div id="hero-skeleton">
+    <!-- Skeleton loader -->
+    <div class="h-12 bg-gray-800 rounded-2xl w-3/4 mb-4 animate-pulse"></div>
+    <div class="h-4 bg-gray-800 rounded w-1/4 mb-3 animate-pulse"></div>
+    <div class="h-4 bg-gray-800 rounded w-1/5 mb-8 animate-pulse"></div>
+    <div class="w-full h-72 bg-gray-800 rounded-3xl animate-pulse"></div>
+  </div>
+
+  <div id="hero-content" class="hidden fade-in">
+    <h1 id="title"       class="text-4xl md:text-5xl font-black mb-4 leading-tight"></h1>
+    <p  id="date"        class="text-gray-400 text-sm mb-2"></p>
+    <p  id="readingTime" class="text-green-400 text-sm mb-8"></p>
+    <img id="featuredImage" class="w-full rounded-3xl hidden" loading="lazy" alt="">
+  </div>
 </section>
 
+<!-- Article body -->
 <main class="max-w-4xl mx-auto px-6 pb-20">
-<div id="content" class="article-content">Loading article...</div>
+  <div id="content" class="article-content fade-in"></div>
 
-<div class="mt-10 flex gap-4">
-<button id="copyBtn" class="bg-green-500 text-black px-4 py-2 rounded">Copy Link</button>
-<a href="index.html" class="border border-green-500 px-4 py-2 rounded">All Blogs</a>
-</div>
+  <!-- Action buttons (shown after load) -->
+  <div id="action-bar" class="hidden mt-10 flex gap-4 flex-wrap">
+    <button id="copyBtn"
+      class="bg-green-500 hover:bg-green-400 transition text-black font-semibold px-6 py-3 rounded-xl">
+      Copy Link
+    </button>
+    <a href="index.html"
+      class="border border-green-500 hover:bg-green-500 hover:text-black transition px-6 py-3 rounded-xl font-semibold">
+      All Blogs
+    </a>
+  </div>
 </main>
 
 <script>
-const firebaseConfig = {
-    apiKey: "AIzaSyCdI8gnXTw7bAuB7ssCA044qf12neionYk",
-    authDomain: "marketinghub-4eb62.firebaseapp.com",
-    projectId: "marketinghub-4eb62",
-    storageBucket: "marketinghub-4eb62.firebasestorage.app",
+// ===== FIREBASE INIT (safe – won't crash if already initialized) =====
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:            "AIzaSyCdI8gnXTw7bAuB7ssCA044qf12neionYk",
+    authDomain:        "marketinghub-4eb62.firebaseapp.com",
+    projectId:         "marketinghub-4eb62",
+    storageBucket:     "marketinghub-4eb62.firebasestorage.app",
     messagingSenderId: "431361025139",
-    appId: "1:431361025139:web:bf495f269b30228a407606",
-    measurementId: "G-5LN2F8C2VL"
-};
-
-firebase.initializeApp(firebaseConfig);
+    appId:             "1:431361025139:web:bf495f269b30228a407606",
+    measurementId:     "G-5LN2F8C2VL"
+  });
+}
 const db = firebase.database();
 
-function stripHtml(html){
- const div=document.createElement('div');
- div.innerHTML=html;
- return div.textContent||div.innerText||'';
+// ===== HELPERS =====
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
 }
 
-const slug=new URLSearchParams(location.search).get("slug");
-
-if(slug){
- db.ref("blogs").orderByChild("slug").equalTo(slug).once("value")
- .then(snapshot=>{
-   const data=snapshot.val();
-   if(!data){
-      document.getElementById("content").innerHTML="<h2>Article Not Found</h2>";
-      return;
-   }
-
-   const post=Object.values(data)[0];
-
-   document.title=post.title+" | MarketingHub";
-   document.getElementById("title").textContent=post.title||"Untitled";
-   document.getElementById("date").textContent=post.date||"";
-
-   if(post.image){
-      const img=document.getElementById("featuredImage");
-      img.src=post.image;
-      img.classList.remove("hidden");
-   }
-
-   document.getElementById("content").innerHTML=post.content||"";
-
-   const words=stripHtml(post.content||"").split(/\s+/).length;
-   document.getElementById("readingTime").textContent=Math.ceil(words/200)+" min read";
-
-   const desc=stripHtml(post.content||"").substring(0,160);
-   document.querySelector('meta[name="description"]').setAttribute("content",desc);
- })
- .catch(err=>{
-   document.getElementById("content").innerHTML="<h2>Error Loading Article</h2>";
-   console.error(err);
- });
+function setMeta(name, value, attr = 'content') {
+  const el = document.querySelector(`meta[name="${name}"]`)
+          || document.querySelector(`meta[property="${name}"]`)
+          || document.getElementById(name);
+  if (el) el.setAttribute(attr, value);
 }
 
-document.getElementById("copyBtn").addEventListener("click",()=>{
- navigator.clipboard.writeText(location.href);
- alert("Link copied");
+function showError(title, message) {
+  document.getElementById('hero-skeleton').classList.add('hidden');
+  document.getElementById('content').innerHTML = `
+    <div class="error-box">
+      <h2>${title}</h2>
+      <p>${message}</p>
+      <a href="index.html">← Back to all blogs</a>
+    </div>`;
+}
+
+// ===== READING PROGRESS =====
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const height    = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const pct       = height > 0 ? (scrollTop / height) * 100 : 0;
+  document.getElementById('progress').style.width = pct + '%';
 });
 
-window.addEventListener("scroll",()=>{
- const winScroll=document.documentElement.scrollTop;
- const height=document.documentElement.scrollHeight-document.documentElement.clientHeight;
- const scrolled=(winScroll/height)*100;
- document.getElementById("progress").style.width=scrolled+"%";
+// ===== COPY LINK =====
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(location.href)
+    .then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Link', 2000);
+    });
 });
+
+// ===== LOAD ARTICLE =====
+const slug = new URLSearchParams(location.search).get('slug');
+
+if (!slug) {
+  // No slug in URL at all
+  showError('No Article Specified', 'Please go back and select a blog post to read.');
+} else {
+  db.ref('blogs').orderByChild('slug').equalTo(slug).once('value')
+    .then(snapshot => {
+      const data = snapshot.val();
+
+      if (!data) {
+        showError('Article Not Found', 'This post may have been removed or the link is incorrect.');
+        return;
+      }
+
+      const post = Object.values(data)[0];
+
+      // ---- Page title ----
+      document.title = (post.title || 'Untitled') + ' | MarketingHub';
+
+      // ---- Canonical URL ----
+      document.getElementById('canonical-tag').href = location.href;
+
+      // ---- OG / Social meta ----
+      const plainDesc = stripHtml(post.content || '').substring(0, 160);
+      document.getElementById('og-title').setAttribute('content', post.title || 'MarketingHub Blog');
+      document.getElementById('og-description').setAttribute('content', plainDesc);
+      document.getElementById('og-image').setAttribute('content', post.image || '');
+      document.getElementById('og-url').setAttribute('content', location.href);
+      document.querySelector('meta[name="description"]').setAttribute('content', plainDesc);
+
+      // ---- Hero section ----
+      document.getElementById('title').textContent = post.title || 'Untitled';
+      document.getElementById('date').textContent  = post.date  || '';
+
+      // Reading time (safe: handles empty content)
+      const wordCount = (stripHtml(post.content || '').match(/\S+/g) || []).length;
+      const mins      = Math.max(1, Math.ceil(wordCount / 200));
+      document.getElementById('readingTime').textContent = mins + ' min read';
+
+      // Featured image
+      if (post.image) {
+        const img = document.getElementById('featuredImage');
+        img.src = post.image;
+        img.alt = post.title || '';
+        img.classList.remove('hidden');
+      }
+
+      // Show hero, hide skeleton
+      document.getElementById('hero-skeleton').classList.add('hidden');
+      document.getElementById('hero-content').classList.remove('hidden');
+
+      // ---- Article body ----
+      document.getElementById('content').innerHTML = post.content || '<p>No content available.</p>';
+
+      // ---- Show action buttons ----
+      document.getElementById('action-bar').classList.remove('hidden');
+    })
+    .catch(err => {
+      console.error('Firebase error:', err);
+      showError('Error Loading Article', 'Something went wrong. Please try again later.');
+    });
+}
 </script>
 </body>
 </html>
