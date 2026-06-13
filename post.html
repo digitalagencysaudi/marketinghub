@@ -1,19 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Dynamic — filled by JS after fetch -->
 <title>MarketingHub</title>
-
 <meta name="description" content="MarketingHub Blog Article">
-<meta name="robots" content="index,follow">
-<link rel="canonical" id="canonical-url" href="">
+<meta name="robots"      content="index,follow">
+<link rel="canonical"    id="canonical-url" href="">
 
-<meta property="og:type" content="article">
-<meta property="og:title" content="MarketingHub">
-<meta property="og:description" content="MarketingHub Blog">
-<meta property="og:image" content="">
+<!-- Open Graph -->
+<meta property="og:type"        content="article">
+<meta property="og:title"       id="og-title"       content="MarketingHub">
+<meta property="og:description" id="og-description" content="MarketingHub Blog">
+<meta property="og:image"       id="og-image"       content="">
+<meta property="og:url"         id="og-url"         content="">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -22,173 +24,293 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <style>
-body{font-family:Inter,sans-serif;background:#050505;color:#fff}
-.hero-bg{
-background:radial-gradient(circle at top left,rgba(34,197,94,.18),transparent 40%),
-radial-gradient(circle at bottom right,rgba(34,197,94,.12),transparent 40%);
-}
-.article-content{line-height:1.9;color:#d1d5db}
-.article-content img{width:100%;border-radius:20px;margin:30px 0}
-.article-content h1,.article-content h2,.article-content h3{color:#fff;margin:20px 0}
-.article-content p{margin-bottom:20px}
-.article-content ul,.article-content ol{margin:20px}
-.progress{position:fixed;top:0;left:0;height:4px;background:#22c55e;width:0;z-index:9999}
+  body { font-family: Inter, sans-serif; background: #050505; color: #fff; }
+
+  .hero-bg {
+    background:
+      radial-gradient(circle at top left,  rgba(34,197,94,.18), transparent 40%),
+      radial-gradient(circle at bottom right, rgba(34,197,94,.12), transparent 40%);
+  }
+
+  /* Reading progress bar */
+  .progress {
+    position: fixed; top: 0; left: 0;
+    height: 4px; background: #22c55e; width: 0; z-index: 9999;
+    transition: width 0.1s linear;
+  }
+
+  /* Article body styles */
+  .article-content { line-height: 1.9; color: #d1d5db; }
+  .article-content img       { width: 100%; border-radius: 20px; margin: 30px 0; }
+  .article-content h1,
+  .article-content h2,
+  .article-content h3        { color: #fff; margin: 28px 0 12px; font-weight: 800; }
+  .article-content h1        { font-size: 2rem; }
+  .article-content h2        { font-size: 1.6rem; color: #22c55e; }
+  .article-content h3        { font-size: 1.3rem; }
+  .article-content p         { margin-bottom: 20px; }
+  .article-content ul        { list-style: disc;    margin: 16px 0 16px 28px; }
+  .article-content ol        { list-style: decimal; margin: 16px 0 16px 28px; }
+  .article-content li        { margin-bottom: 8px; }
+  .article-content a         { color: #22c55e; text-decoration: underline; }
+  .article-content strong    { color: #fff; }
+  .article-content blockquote {
+    border-left: 4px solid #22c55e;
+    padding: 10px 20px; margin: 24px 0;
+    background: rgba(255,255,255,0.04);
+    border-radius: 0 12px 12px 0;
+    color: #9ca3af; font-style: italic;
+  }
+  .article-content pre  { background: #111; padding: 16px; border-radius: 12px; overflow-x: auto; }
+  .article-content code { font-family: monospace; color: #86efac; font-size: 0.9em; }
+
+  /* Fade-in */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeUp 0.5s ease forwards; }
+
+  /* Skeleton */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .skeleton { animation: pulse 1.6s ease-in-out infinite; background: rgba(255,255,255,0.07); border-radius: 12px; }
+
+  /* Copy button feedback */
+  #copyBtn.copied { background: #16a34a; }
 </style>
 </head>
 
 <body>
 
+<!-- Reading progress -->
 <div id="progress" class="progress"></div>
 
+<!-- ===== HERO ===== -->
 <section class="hero-bg">
-<div class="max-w-6xl mx-auto px-6 py-8">
-<a href="index.html" class="text-green-400 font-bold">← Back to Blogs</a>
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    <a href="index.html" class="text-green-400 font-bold hover:text-green-300 transition text-sm">← Back to Blogs</a>
 
-<div class="py-16">
-<h1 id="articleTitle" class="text-5xl md:text-7xl font-black mb-6">
-Loading...
-</h1>
+    <div class="py-16">
+      <!-- Skeleton while loading -->
+      <div id="title-skeleton">
+        <div class="skeleton h-14 w-3/4 mb-4"></div>
+        <div class="skeleton h-4 w-48"></div>
+      </div>
 
-<div class="flex gap-4 text-gray-400">
-<span id="articleDate"></span>
-<span>•</span>
-<span id="readingTime"></span>
-</div>
-</div>
-</div>
+      <!-- Real content (hidden until loaded) -->
+      <div id="title-content" class="hidden fade-in">
+        <h1 id="articleTitle" class="text-4xl md:text-6xl font-black mb-6 leading-tight"></h1>
+        <div class="flex flex-wrap gap-3 text-gray-400 text-sm items-center">
+          <span id="articleDate"></span>
+          <span id="date-dot" class="hidden">•</span>
+          <span id="readingTime" class="text-green-400 font-medium"></span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- ===== ARTICLE ===== -->
 <main class="max-w-5xl mx-auto px-6 py-10">
 
-<img id="featuredImage"
-class="hidden w-full rounded-3xl mb-10"
-loading="lazy"
-alt="">
+  <!-- Featured image -->
+  <img id="featuredImage"
+    class="hidden w-full rounded-3xl mb-10 fade-in"
+    loading="lazy" alt="">
 
-<div class="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12">
+  <!-- Article card -->
+  <div class="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 fade-in">
 
-<div id="content" class="article-content">
-Loading article...
-</div>
+    <!-- Body skeleton -->
+    <div id="content-skeleton" class="space-y-4">
+      <div class="skeleton h-4 w-full"></div>
+      <div class="skeleton h-4 w-5/6"></div>
+      <div class="skeleton h-4 w-4/6"></div>
+      <div class="skeleton h-4 w-full mt-6"></div>
+      <div class="skeleton h-4 w-3/4"></div>
+      <div class="skeleton h-4 w-full"></div>
+    </div>
 
-<div class="mt-10 flex gap-4 flex-wrap">
-<button id="copyBtn"
-class="bg-green-500 text-black px-6 py-3 rounded-xl font-bold">
-Copy Link
-</button>
+    <!-- Article body -->
+    <div id="content" class="article-content hidden"></div>
 
-<a href="index.html"
-class="border border-green-500 px-6 py-3 rounded-xl text-green-400">
-All Blogs
-</a>
-</div>
+    <!-- Action buttons -->
+    <div id="action-bar" class="hidden mt-10 flex gap-4 flex-wrap">
+      <button id="copyBtn"
+        class="bg-green-500 hover:bg-green-400 transition text-black px-6 py-3 rounded-xl font-bold">
+        Copy Link
+      </button>
+      <a href="index.html"
+        class="border border-green-500 hover:bg-green-500 hover:text-black transition px-6 py-3 rounded-xl text-green-400 font-semibold">
+        All Blogs
+      </a>
+    </div>
 
-</div>
+  </div>
 
 </main>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCdI8gnXTw7bAuB7ssCA044qf12neionYk",
-  authDomain: "marketinghub-4eb62.firebaseapp.com",
-  databaseURL: "https://marketinghub-4eb62-default-rtdb.firebaseio.com",
-  projectId: "marketinghub-4eb62",
-  storageBucket: "marketinghub-4eb62.firebasestorage.app",
-  messagingSenderId: "431361025139",
-  appId: "1:431361025139:web:bf495f269b30228a407606",
-  measurementId: "G-5LN2F8C2VL"
-};
 
-firebase.initializeApp(firebaseConfig);
+<script>
+// ===== FIREBASE (safe init) =====
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:            "AIzaSyCdI8gnXTw7bAuB7ssCA044qf12neionYk",
+    authDomain:        "marketinghub-4eb62.firebaseapp.com",
+    databaseURL:       "https://marketinghub-4eb62-default-rtdb.firebaseio.com",
+    projectId:         "marketinghub-4eb62",
+    storageBucket:     "marketinghub-4eb62.firebasestorage.app",
+    messagingSenderId: "431361025139",
+    appId:             "1:431361025139:web:bf495f269b30228a407606",
+    measurementId:     "G-5LN2F8C2VL"
+  });
+}
 const database = firebase.database();
 
-document.getElementById("canonical-url").href = window.location.href;
+// ===== HELPERS =====
 
-const slug = new URLSearchParams(window.location.search).get("slug");
-
-if(!slug){
-    show404();
-}else{
-    database.ref("blogs")
-    .orderByChild("slug")
-    .equalTo(slug)
-    .once("value")
-    .then(snapshot=>{
-
-        const data = snapshot.val();
-
-        if(!data){
-            show404();
-            return;
-        }
-
-        const post = Object.values(data)[0];
-
-        document.title = post.title + " | MarketingHub";
-
-        document.getElementById("articleTitle").innerText =
-        post.title || "Untitled";
-
-        document.getElementById("articleDate").innerText =
-        post.date || "";
-
-        document.getElementById("content").innerHTML =
-        post.content || "";
-
-        if(post.image){
-            const img = document.getElementById("featuredImage");
-            img.src = post.image;
-            img.alt = post.title;
-            img.classList.remove("hidden");
-        }
-
-        const text =
-        (post.content || "").replace(/<[^>]*>/g,'');
-
-        document.querySelector('meta[name="description"]')
-        .setAttribute("content", text.substring(0,160));
-
-        const words = text.split(/\s+/).length;
-
-        document.getElementById("readingTime").innerText =
-        Math.ceil(words/200) + " min read";
-
-    })
-    .catch(show404);
+// Properly strips HTML tags AND decodes entities
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return (div.textContent || div.innerText || '').replace(/\s+/g, ' ').trim();
 }
 
-function show404(){
-    document.title = "Article Not Found";
-
-    document.getElementById("articleTitle").innerText =
-    "Article Not Found";
-
-    document.getElementById("content").innerHTML = `
-    <div class="text-center py-20">
-        <h2 class="text-4xl font-bold mb-4">
-            Article Not Found
-        </h2>
-        <p class="text-gray-400 mb-8">
-            The requested article could not be found.
-        </p>
-        <a href="index.html"
-           class="bg-green-500 text-black px-6 py-3 rounded-xl font-bold">
-           Back Home
-        </a>
+// Show not-found state
+function show404() {
+  document.title = "Article Not Found | MarketingHub";
+  document.getElementById('title-skeleton').classList.add('hidden');
+  document.getElementById('title-content').classList.remove('hidden');
+  document.getElementById('articleTitle').textContent = "Article Not Found";
+  document.getElementById('content-skeleton').classList.add('hidden');
+  document.getElementById('content').classList.remove('hidden');
+  document.getElementById('content').innerHTML = `
+    <div class="text-center py-16">
+      <p class="text-6xl mb-6">🔍</p>
+      <h2 class="text-3xl font-bold mb-4">Article Not Found</h2>
+      <p class="text-gray-400 mb-8">
+        This post may have been removed or the link is incorrect.
+      </p>
+      <a href="index.html"
+         class="bg-green-500 hover:bg-green-400 transition text-black px-8 py-4 rounded-xl font-bold inline-block">
+        ← Back to all blogs
+      </a>
     </div>`;
 }
 
-document.getElementById("copyBtn").addEventListener("click",()=>{
-navigator.clipboard.writeText(window.location.href);
-alert("Link copied");
+// Show network/Firebase error (different from 404)
+function showError(err) {
+  console.error("Firebase error:", err);
+  document.title = "Error | MarketingHub";
+  document.getElementById('title-skeleton').classList.add('hidden');
+  document.getElementById('title-content').classList.remove('hidden');
+  document.getElementById('articleTitle').textContent = "Something Went Wrong";
+  document.getElementById('content-skeleton').classList.add('hidden');
+  document.getElementById('content').classList.remove('hidden');
+  document.getElementById('content').innerHTML = `
+    <div class="text-center py-16">
+      <p class="text-6xl mb-6">⚠️</p>
+      <h2 class="text-3xl font-bold mb-4 text-red-400">Failed to Load Article</h2>
+      <p class="text-gray-400 mb-8">
+        There was a network error. Please check your connection and try again.
+      </p>
+      <a href="index.html"
+         class="bg-green-500 hover:bg-green-400 transition text-black px-8 py-4 rounded-xl font-bold inline-block">
+        ← Back to all blogs
+      </a>
+    </div>`;
+}
+
+// ===== READING PROGRESS =====
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const height    = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  // Avoid division by zero on short pages; hide bar if page doesn't scroll
+  document.getElementById('progress').style.width =
+    height > 50 ? ((scrollTop / height) * 100) + '%' : '0%';
 });
 
-window.addEventListener("scroll",()=>{
-const winScroll=document.documentElement.scrollTop;
-const height=document.documentElement.scrollHeight-document.documentElement.clientHeight;
-const scrolled=(winScroll/height)*100;
-document.getElementById("progress").style.width=scrolled+"%";
+// ===== COPY LINK (no alert popup) =====
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy Link';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
 });
+
+// ===== LOAD ARTICLE =====
+
+// Set canonical immediately (doesn't need post data)
+document.getElementById('canonical-url').href = window.location.href;
+document.getElementById('og-url').setAttribute('content', window.location.href);
+
+const slug = new URLSearchParams(window.location.search).get('slug');
+
+if (!slug) {
+  show404();
+} else {
+  database.ref('blogs')
+    .orderByChild('slug')
+    .equalTo(decodeURIComponent(slug))
+    .once('value')
+    .then(snapshot => {
+      const data = snapshot.val();
+      if (!data) { show404(); return; }
+
+      const post = Object.values(data)[0];
+
+      // ---- Page title ----
+      document.title = (post.title || 'Untitled') + ' | MarketingHub';
+
+      // ---- OG / Social meta ----
+      const plainText = stripHtml(post.content || '');
+      const desc      = plainText.substring(0, 160);
+
+      document.getElementById('og-title').setAttribute('content', post.title || 'MarketingHub');
+      document.getElementById('og-description').setAttribute('content', desc);
+      document.getElementById('og-image').setAttribute('content', post.image || '');
+      document.querySelector('meta[name="description"]').setAttribute('content', desc);
+
+      // ---- Hero ----
+      document.getElementById('articleTitle').textContent = post.title || 'Untitled';
+
+      if (post.date) {
+        document.getElementById('articleDate').textContent = post.date;
+        document.getElementById('date-dot').classList.remove('hidden');
+      }
+
+      // Safe reading time: handles empty content (no NaN)
+      const wordCount = (plainText.match(/\S+/g) || []).length;
+      const mins      = Math.max(1, Math.ceil(wordCount / 200));
+      document.getElementById('readingTime').textContent = mins + ' min read';
+
+      // Show hero, hide skeleton
+      document.getElementById('title-skeleton').classList.add('hidden');
+      document.getElementById('title-content').classList.remove('hidden');
+
+      // ---- Featured image ----
+      if (post.image) {
+        const img = document.getElementById('featuredImage');
+        img.src   = post.image;
+        img.alt   = post.title || '';
+        img.classList.remove('hidden');
+      }
+
+      // ---- Article body ----
+      document.getElementById('content-skeleton').classList.add('hidden');
+      document.getElementById('content').innerHTML = post.content || '<p>No content available.</p>';
+      document.getElementById('content').classList.remove('hidden');
+
+      // ---- Action bar ----
+      document.getElementById('action-bar').classList.remove('hidden');
+    })
+    .catch(showError);   // Network errors get a distinct message, not a 404
+}
 </script>
 
 </body>
